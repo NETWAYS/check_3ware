@@ -1,0 +1,19 @@
+name: 
+description: "file:///README.md"
+url: "https://www.netways.org/projects/plugins"
+tags: ~
+vendor: Netways
+target: Temperature
+type: Plugin
+license: gplv2
+releases: 
+  - 
+    name: 1.0
+    description: "1.0 Release"
+    files: 
+      - 
+        name: check_3ware.pl
+        url: "file:///check_3ware.pl"
+        description: "Icinga check plugin"
+        checksum: 3e27d4714ae80fb5cc5defa0d29518bc
+
