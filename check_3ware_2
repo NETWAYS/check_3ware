@@ -1,0 +1,120 @@
+#!/bin/sh
+#
+# NAGIOS Plugin: check_3ware_2
+# Check the status of the 3ware raid controller with tw_cli
+#
+# COPYRIGHT:
+#
+# This software is Copyright (c) NETWAYS GmbH, Stefan Gundel
+#                                <support@netways.de>
+#
+# (Except where explicitly superseded by other copyright notices)
+#
+#
+# LICENSE:
+#
+# This work is made available to you under the terms of Version 2 of
+# the GNU General Public License. A copy of that license should have
+# been provided with this software, but in any event can be snarfed
+# from http://www.fsf.org.
+#
+# This work is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301 or visit their web page on the internet at
+# http://www.fsf.org.
+#
+#
+# CONTRIBUTION SUBMISSION POLICY:
+#
+# (The following paragraph is not intended to limit the rights granted
+# to you to modify and distribute this software under the terms of
+# the GNU General Public License and is only of importance to you if
+# you choose to contribute your changes and enhancements to the
+# community by submitting them to NETWAYS GmbH.)
+#
+# By intentionally submitting any modifications, corrections or
+# derivatives to this work, or any other work intended for use with
+# this Software, to NETWAYS GmbH, you confirm that
+# you are the copyright holder for those contributions and you grant
+# NETWAYS GmbH a nonexclusive, worldwide, irrevocable,
+# royalty-free, perpetual, license to use, copy, create derivative
+# works based on those contributions, and sublicense and distribute
+# those contributions and any derivatives thereof.
+#
+# Nagios and the Nagios logo are registered trademarks of Ethan Galstad.
+
+
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+PROGNAME=`basename $0`
+PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+REVISION=`echo '$Revision: 1.0 $' | sed -e 's/[^0-9.]//g'`
+
+print_usage() {
+	echo "Usage: $PROGNAME <Controller-ID> <Unit-ID>"
+	echo "e.g. check_3ware2 c0 u0"
+	echo ""
+}
+
+print_help() {
+	echo ""
+	print_usage
+	echo ""
+	echo "This plugin checks alarm status of 3ware RAID controllers."
+	echo "AMCC/3ware CLI (version 2.00.02.008) or higher required"
+	echo ""
+	exit 0
+}
+
+if [ $# -ne 2 ]; then
+        print_usage
+	exit 0
+fi
+
+case "$1" in
+	--help)
+		print_help
+		exit 0
+		;;
+	-h)
+		print_help
+		exit 0
+		;;
+	--version)
+   	print_revision $PROGNAME $REVISION
+		exit 0
+		;;
+	-V)
+		print_revision $PROGNAME $REVISION
+		exit 0
+		;;
+	*)
+		raidutiloutput=`sudo tw_cli info $1 $2 status | awk '{print \$4}' 2>&1`
+		status=$raidutiloutput
+		if test "$1" = "-v" -o "$1" = "--verbose"; then
+			echo ${raidutiloutput}
+		fi
+		if test ! -x /usr/sbin/tw_cli; then
+			echo "TW_CLI UNKNOWN - command not found (did you install tw_cli?)"
+			exit -1
+		elif test ${status} = REBUILDING; then
+			echo "RAID WARNING - RAID is $status"
+			exit 1
+		elif test ${status} = DEGRADED; then
+			echo "RAID CRITICAL - RAID is $status!"
+			exit 2
+		elif test ${status} = OK; then
+			echo "RAID O.K. (Unit $2 at Controller $1 is OK)"
+			exit 0
+		else
+			echo "RAID CRITICAL - RAID Status is UNKNOWN"
+			exit 2
+		fi
+		;;
+esac
