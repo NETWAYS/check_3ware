@@ -1,0 +1,29 @@
+--- 
+name: check_3ware
+description: "file:///README.md"
+url: "https://www.netways.org/projects/plugins"
+tags: ~
+vendor: NETWAYS, 3ware
+target: Service, Hardware, Storage 
+type: Plugin
+license: gplv2
+releases: 
+  - 
+    name: v1.0
+    description: "Check the status of the 3ware raid controler with tw_cli"
+    files: 
+      - 
+        name: check_3ware.pl
+        url: "file:///check_3ware.pl"
+        description: none 
+        checksum: 3e27d4714ae80fb5cc5defa0d29518bc
+      - 
+        name: check_3ware_2
+        url: "file:///check_3ware_2"
+        description: none 
+        checksum: 3ae34e2984c5346f1dca2669992ca0c4
+      - 
+        name: check_dpti.pl
+        url: "file:///check_dpti.pl"
+        description: none
+        checksum: 83dd01752f22c4bfb94f5e2cc2e31b6b
